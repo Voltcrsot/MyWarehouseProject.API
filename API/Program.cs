@@ -1,16 +1,13 @@
-using MyWarehouseProject.Infrastructure.Repositories;
-using MyWarehouseProject.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using MyWarehouseProject.Domain.Repositories;
 using MyWarehouseProject.Application.Interfaces;
 using MyWarehouseProject.Application.Services;
+using MyWarehouseProject.Domain.Repositories;
+using MyWarehouseProject.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddDbContext<WarehouseDbContext>(options =>
-    options.UseSqlite("Data Source=warehouse.db"));
+//// Add services to the container.
+//builder.Services.AddDbContext<WarehouseDbContext>(options =>
+//    options.UseSqlite("Data Source=warehouse.db"));             // todo: 1) use appsettings.json 2) it's a infrastructure's responsibility. MOVE IT.
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 
