@@ -62,6 +62,7 @@ namespace MyWarehouseProject.Infrastructure.Data
             };
 
             modelBuilder.Entity<Stock>().HasData(stockEntries);
+
         }
     }
 }

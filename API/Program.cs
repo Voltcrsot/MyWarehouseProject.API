@@ -1,27 +1,40 @@
-using MyWarehouseProject.Application.Interfaces;
 using MyWarehouseProject.Application.Services;
 using MyWarehouseProject.Domain.Repositories;
 using MyWarehouseProject.Infrastructure.Repositories;
+using MyWarehouseProject.Infrastructure.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//// Add services to the container.
-//builder.Services.AddDbContext<WarehouseDbContext>(options =>
-//    options.UseSqlite("Data Source=warehouse.db"));             // todo: 1) use appsettings.json 2) it's a infrastructure's responsibility. MOVE IT.
+// Получаем строку подключения из appsettings.json
+var connectionString = builder.Configuration.GetConnectionString("WarehouseDb");
+
+// Регистрация контекста базы данных через метод расширения для SQLite
+builder.Services.AddDbContext<WarehouseDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+// Явная регистрация репозиториев
 builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 
-// Register repositories as scoped services.
-builder.Services.AddScoped<IWarehouseService, WarehouseService>();
-builder.Services.AddScoped<IStockService, StockService>();
+// Явная регистрация сервисов
+builder.Services.AddScoped<WarehouseService>();
+builder.Services.AddScoped<StockService>();
 
-// Configure JSON serialization options.
+// Настройка сериализации JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     });
 
+// Настройка AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly); // Убедитесь, что у вас есть MappingProfile
+
+// Настройка Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -36,9 +49,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 
-// Map Endpoints
-StockEndpoints.MapEndpoints(app);
+// Регистрация Endpoints
 WarehouseEndpoints.MapEndpoints(app);
+StockEndpoints.MapEndpoints(app);
 
 app.Run();
-

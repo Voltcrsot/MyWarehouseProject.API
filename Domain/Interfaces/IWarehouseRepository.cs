@@ -12,5 +12,7 @@ namespace MyWarehouseProject.Domain.Repositories
         Task AddWarehouseAsync(Warehouse warehouse);
         Task UpdateWarehouseAsync(Warehouse warehouse);
         Task DeleteWarehouseAsync(Guid id);
+        Task BalanceStockBetweenWarehouses(Guid sourceWarehouseId, Guid targetWarehouseId, Guid productId, int quantity);
+        Task AutoBalanceStockAcrossWarehouses(Guid productId, Guid sourceWarehouseId);
     }
 }
