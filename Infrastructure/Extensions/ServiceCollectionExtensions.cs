@@ -18,45 +18,45 @@ namespace MyWarehouseProject.Infrastructure.Service
             return services;
         }
 
-        public static IServiceCollection AddServicesAutomatically(this IServiceCollection services)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var serviceTypes = assembly.GetTypes()
-                .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service"));
+//        public static IServiceCollection AddServicesAutomatically(this IServiceCollection services)
+//        {
+//            var assembly = Assembly.GetExecutingAssembly();
+//            var serviceTypes = assembly.GetTypes()
+//                .Where(t => t.IsClass && !t.IsAbstract && t.Name.EndsWith("Service"));
 
-            foreach (var serviceType in serviceTypes)
-            {
-                var interfaceType = serviceType.GetInterfaces()
-                    .FirstOrDefault(i => i.Name == $"I{serviceType.Name}");
+//            foreach (var serviceType in serviceTypes)
+//            {
+//                var interfaceType = serviceType.GetInterfaces()
+//                    .FirstOrDefault(i => i.Name == $"I{serviceType.Name}");
 
-                if (interfaceType != null)
-                {
-                    services.AddScoped(interfaceType, serviceType);
-                }
-            }
+//                if (interfaceType != null)
+//                {
+//                    services.AddScoped(interfaceType, serviceType);
+//                }
+//            }
 
-            return services;
-        }
+////            return services;
+////        }
 
-        public static IServiceCollection AddRepositoriesAutomatically(this IServiceCollection services)
-        {
-            var assembly = Assembly.GetExecutingAssembly();
-            var interfaceTypes = assembly.GetTypes()
-                .Where(t => t.IsInterface && t.Name.StartsWith("I"));
+////       public static IServiceCollection AddRepositoriesAutomatically(this IServiceCollection services)
+////{
+////    var assembly = Assembly.GetExecutingAssembly();
+////    var interfaceTypes = assembly.GetTypes()
+////        .Where(t => t.IsInterface && t.Name.StartsWith("I"));
 
-            foreach (var interfaceType in interfaceTypes)
-            {
-                var implementationTypes = assembly.GetTypes()
-                    .Where(t => interfaceType.IsAssignableFrom(t) && !t.IsInterface);
+////    foreach (var interfaceType in interfaceTypes)
+////    {
+////        var implementationTypes = assembly.GetTypes()
+////            .Where(t => interfaceType.IsAssignableFrom(t) && !t.IsInterface);
 
-                foreach (var implementationType in implementationTypes)
-                {
-                    services.AddScoped(interfaceType, implementationType);
-                }
-            }
+////        foreach (var implementationType in implementationTypes)
+////        {
+////            services.AddScoped(interfaceType, implementationType);
+////        }
+////    }
 
-            return services;
-        }
+////    return services;
+////}
 
     }
 }
