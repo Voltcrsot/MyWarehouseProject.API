@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using MyWarehouseProject.Domain.Entities;
+﻿using MyWarehouseProject.Domain.Entities;
 
 namespace MyWarehouseProject.Domain.Repositories
 {

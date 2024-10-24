@@ -2,10 +2,7 @@
 using MyWarehouseProject.Domain.Entities;
 using MyWarehouseProject.Domain.Repositories;
 using MyWarehouseProject.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace MyWarehouseProject.Infrastructure.Repositories
 {

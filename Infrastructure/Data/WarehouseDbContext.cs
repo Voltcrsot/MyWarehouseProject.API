@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MyWarehouseProject.Domain.Entities;
-using System;
-using System.Collections.Generic;
 
 namespace MyWarehouseProject.Infrastructure.Data
 {

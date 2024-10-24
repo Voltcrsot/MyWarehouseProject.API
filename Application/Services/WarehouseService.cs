@@ -2,10 +2,7 @@
 using MyWarehouseProject.Application.DTOs;
 using MyWarehouseProject.Domain.Entities;
 using MyWarehouseProject.Domain.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace MyWarehouseProject.Application.Services
 {

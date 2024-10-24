@@ -2,10 +2,8 @@ using MyWarehouseProject.Application.Services;
 using MyWarehouseProject.Domain.Repositories;
 using MyWarehouseProject.Infrastructure.Repositories;
 using MyWarehouseProject.Infrastructure.Data;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +30,7 @@ builder.Services.AddControllers()
     });
 
 // Настройка AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly); // Убедитесь, что у вас есть MappingProfile
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly); 
 
 // Настройка Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -54,3 +52,4 @@ WarehouseEndpoints.MapEndpoints(app);
 StockEndpoints.MapEndpoints(app);
 
 app.Run();
+

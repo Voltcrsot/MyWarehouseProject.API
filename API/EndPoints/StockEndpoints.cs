@@ -1,10 +1,5 @@
 ﻿using MyWarehouseProject.Application.Services;
 using MyWarehouseProject.Application.DTOs;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 public static class StockEndpoints

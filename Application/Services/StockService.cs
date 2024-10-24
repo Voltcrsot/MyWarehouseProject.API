@@ -2,8 +2,6 @@
 using MyWarehouseProject.Application.DTOs;
 using MyWarehouseProject.Domain.Entities;
 using MyWarehouseProject.Domain.Repositories;
-using System;
-using System.Threading.Tasks;
 
 namespace MyWarehouseProject.Application.Services
 {
