@@ -1,5 +1,6 @@
 ﻿using MyWarehouseProject.Application.Services;
 using MyWarehouseProject.Application.DTOs;
+using MyWarehouseProject.Domain.DTOS;
 using Microsoft.AspNetCore.Mvc;
 
 public static class WarehouseEndpoints
@@ -44,13 +45,14 @@ public static class WarehouseEndpoints
             return Results.NoContent();
         });
 
-        // Эндпоинт для балансировки запасов между складами
-        group.MapPost("/balance", async (WarehouseService warehouseService, [FromQuery] Guid sourceWarehouseId, [FromQuery] Guid targetWarehouseId, [FromQuery] Guid productId, [FromQuery] int quantity) =>
+        // Эндпоинт для распределения запасов
+        group.MapPost("/distribute", async (WarehouseService warehouseService, [FromQuery] Guid sourceWarehouseId, [FromQuery] Guid productId, [FromQuery] int quantity, [FromQuery] double nearestWarehousePercentage) =>
         {
             try
             {
-                await warehouseService.BalanceStockBetweenWarehouses(sourceWarehouseId, targetWarehouseId, productId, quantity);
-                return Results.Ok("Stock balanced successfully.");
+                // Вызов метода распределения запасов с отдельными параметрами
+                await warehouseService.DistributeStockAsync(sourceWarehouseId, productId, quantity, nearestWarehousePercentage);
+                return Results.Ok("Stock distributed successfully.");
             }
             catch (Exception ex)
             {
@@ -58,18 +60,34 @@ public static class WarehouseEndpoints
             }
         });
 
-        // Эндпоинт для автоматической балансировки запасов по складам
-        group.MapPost("/auto-balance", async (WarehouseService warehouseService, [FromQuery] Guid productId, [FromQuery] Guid sourceWarehouseId) =>
+
+        // Эндпоинт для балансировки запасов между складами
+        group.MapPost("/balance", async (WarehouseService warehouseService, [FromQuery] Guid SourceWarehouseId, [FromQuery] Guid TargetWarehouseId, [FromQuery] Guid ProductId, [FromQuery] int Quantity) =>
         {
             try
             {
-                await warehouseService.AutoBalanceStockAcrossWarehouses(productId, sourceWarehouseId);
-                return Results.Ok("Stock auto-balanced successfully.");
+                await warehouseService.BalanceStockBetweenWarehouses(SourceWarehouseId, TargetWarehouseId, ProductId, Quantity);
+                return Results.Ok("Stock balanced successfully.");
             }
             catch (Exception ex)
             {
                 return Results.Problem(ex.Message);
             }
         });
+        group.MapPost("/auto-balance", async (WarehouseService warehouseService, [FromQuery] Guid sourceWarehouseId, [FromQuery] Guid productId, [FromQuery] int quantity, [FromQuery] double nearestWarehousePercentage) =>
+        {
+            try
+            {
+
+
+                await warehouseService.DistributeStockAsync(sourceWarehouseId, productId, quantity,nearestWarehousePercentage);
+                return Results.Ok("Запасы успешно сбалансированы.");
+            }
+            catch (Exception ex)
+            {
+                return Results.Problem(ex.Message);
+            }
+        });
+
     }
 }

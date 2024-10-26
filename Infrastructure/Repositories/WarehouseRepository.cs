@@ -3,7 +3,6 @@ using MyWarehouseProject.Domain.Entities;
 using MyWarehouseProject.Domain.Repositories;
 using MyWarehouseProject.Infrastructure.Data;
 
-
 namespace MyWarehouseProject.Infrastructure.Repositories
 {
     public class WarehouseRepository : IWarehouseRepository
@@ -166,6 +165,110 @@ namespace MyWarehouseProject.Infrastructure.Repositories
         {
             return await _context.Stocks
                 .FirstOrDefaultAsync(s => s.WarehouseId == warehouseId && s.ProductId == productId);
+        }
+
+        // Метод для распределения запасов между складами
+        public async Task DistributeStockAsync(Guid productId, Guid sourceWarehouseId)
+        {
+            var sourceWarehouse = await GetWarehouseByIdAsync(sourceWarehouseId);
+            var otherWarehouses = await GetAllWarehousesAsync();
+
+            if (sourceWarehouse == null || !otherWarehouses.Any(w => w.Id != sourceWarehouseId))
+            {
+                throw new InvalidOperationException("Исходный склад не найден или нет других складов.");
+            }
+
+            var sourceStock = await GetStockAsync(sourceWarehouseId, productId);
+            if (sourceStock == null || sourceStock.Quantity <= 0)
+            {
+                throw new InvalidOperationException("Нет запасов данного продукта на исходном складе.");
+            }
+
+            var totalQuantity = sourceStock.Quantity;
+            var halfQuantity = totalQuantity / 2; // 50% на ближайший склад
+            var remainingQuantity = totalQuantity - halfQuantity;
+
+            // Находим ближайший склад (здесь вам нужно будет добавить свою логику для поиска ближайшего склада)
+            var nearestWarehouse = otherWarehouses.FirstOrDefault(); // Замените эту логику на вашу
+
+            // Увеличиваем количество на ближайшем складе
+            if (nearestWarehouse != null)
+            {
+                var nearestStock = await GetStockAsync(nearestWarehouse.Id, productId);
+
+                if (nearestStock != null)
+                {
+                    nearestStock.Quantity += halfQuantity;
+                    _context.Stocks.Update(nearestStock);
+                }
+                else
+                {
+                    nearestStock = new Stock
+                    {
+                        ProductId = productId,
+                        WarehouseId = nearestWarehouse.Id,
+                        Quantity = halfQuantity
+                    };
+                    await _context.Stocks.AddAsync(nearestStock);
+                }
+            }
+
+            // Распределяем оставшиеся запасы между остальными складами
+            var targetWarehouseCount = otherWarehouses.Count(w => w.Id != sourceWarehouseId && w.Id != nearestWarehouse?.Id);
+            if (targetWarehouseCount > 0)
+            {
+                var quantityPerWarehouse = remainingQuantity / targetWarehouseCount;
+                var remainder = remainingQuantity % targetWarehouseCount;
+
+                foreach (var warehouse in otherWarehouses.Where(w => w.Id != sourceWarehouseId && w.Id != nearestWarehouse?.Id))
+                {
+                    var targetStock = await GetStockAsync(warehouse.Id, productId);
+
+                    if (targetStock != null)
+                    {
+                        targetStock.Quantity += quantityPerWarehouse;
+                        _context.Stocks.Update(targetStock);
+                    }
+                    else
+                    {
+                        targetStock = new Stock
+                        {
+                            ProductId = productId,
+                            WarehouseId = warehouse.Id,
+                            Quantity = quantityPerWarehouse
+                        };
+                        await _context.Stocks.AddAsync(targetStock);
+                    }
+                }
+
+                // Обработка остатка
+                if (remainder > 0)
+                {
+                    var firstWarehouse = otherWarehouses.First(w => w.Id != sourceWarehouseId && w.Id != nearestWarehouse?.Id);
+                    var firstStock = await GetStockAsync(firstWarehouse.Id, productId);
+                    if (firstStock != null)
+                    {
+                        firstStock.Quantity += remainder;
+                        _context.Stocks.Update(firstStock);
+                    }
+                    else
+                    {
+                        firstStock = new Stock
+                        {
+                            ProductId = productId,
+                            WarehouseId = firstWarehouse.Id,
+                            Quantity = remainder
+                        };
+                        await _context.Stocks.AddAsync(firstStock);
+                    }
+                }
+            }
+
+            // Обнуляем количество товара на исходном складе
+            sourceStock.Quantity = 0; // Обнуляем количество, т.к. все запасы перераспределены
+            _context.Stocks.Update(sourceStock);
+
+            await _context.SaveChangesAsync();
         }
     }
 }
